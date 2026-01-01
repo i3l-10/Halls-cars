@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صاحب القاعة - منصة الحجز المتكاملة</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- شريط التنقل -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">
+                <i class="fas fa-calendar-check text-primary me-2"></i>
+                حجز
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#dashboard">لوحة التحكم</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#my-venues">أماكني</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#bookings">الحجوزات</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reviews">المراجعات</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <div id="ownerMenu" class="d-none">
+                        <span class="me-3">مرحباً، <span id="ownerName"></span></span>
+                        <button class="btn btn-outline-primary btn-sm me-2" onclick="showOwnerProfile()">
+                            <i class="fas fa-user"></i> الملف الشخصي
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" onclick="ownerLogout()">
+                            <i class="fas fa-sign-out-alt"></i> خروج
+                        </button>
+                    </div>
+                    <div id="ownerAuthButtons">
+                        <button class="btn btn-outline-primary btn-sm me-2" onclick="showOwnerLogin()">
+                            <i class="fas fa-sign-in-alt"></i> دخول
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="showOwnerRegister()">
+                            <i class="fas fa-user-plus"></i> تسجيل
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- صفحة دخول صاحب القاعة -->
+    <div id="ownerLoginModal" class="modal fade">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تسجيل الدخول لصاحب القاعة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="ownerLoginForm">
+                        <div class="mb-3">
+                            <label class="form-label">البريد الإلكتروني</label>
+                            <input type="email" class="form-control" id="ownerLoginEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">كلمة المرور</label>
+                            <input type="password" class="form-control" id="ownerLoginPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-sign-in-alt me-2"></i> دخول
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- صفحة تسجيل صاحب القاعة -->
+    <div id="ownerRegisterModal" class="modal fade">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">إنشاء حساب لصاحب القاعة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="ownerRegisterForm">
+                        <div class="mb-3">
+                            <label class="form-label">الاسم الكامل</label>
+                            <input type="text" class="form-control" id="ownerRegisterName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">البريد الإلكتروني</label>
+                            <input type="email" class="form-control" id="ownerRegisterEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">رقم الهاتف</label>
+                            <input type="tel" class="form-control" id="ownerRegisterPhone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">اسم الشركة/المكان</label>
+                            <input type="text" class="form-control" id="businessName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">رقم الترخيص التجاري</label>
+                            <input type="text" class="form-control" id="businessLicense">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">كلمة المرور</label>
+                            <input type="password" class="form-control" id="ownerRegisterPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-user-plus me-2"></i> تسجيل
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- لوحة تحكم صاحب القاعة -->
+    <section id="ownerDashboard" class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="mb-4">لوحة تحكم صاحب القاعة</h2>
+                    
+                    <!-- الإحصائيات -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-building fa-2x text-primary mb-2"></i>
+                                    <h5 class="card-title">الأماكن النشطة</h5>
+                                    <p class="card-text h4 text-primary" id="activeVenues">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-calendar-check fa-2x text-success mb-2"></i>
+                                    <h5 class="card-title">الحجوزات النشطة</h5>
+                                    <p class="card-text h4 text-success" id="activeBookings">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-star fa-2x text-warning mb-2"></i>
+                                    <h5 class="card-title">متوسط التقييم</h5>
+                                    <p class="card-text h4 text-warning" id="avgRating">0.0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-dollar-sign fa-2x text-info mb-2"></i>
+                                    <h5 class="card-title">إجمالي الإيرادات</h5>
+                                    <p class="card-text h4 text-info" id="totalRevenue">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- الأماكن قيد المراجعة -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">الأماكن قيد المراجعة</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="pendingVenues" class="row">
+                                <!-- سيتم إضافة الأماكن قيد المراجعة هنا -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- صفحة إدارة الأماكن -->
+    <section id="myVenuesSection" class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>أماكني</h2>
+                        <button class="btn btn-primary" onclick="showCreateVenue()">
+                            <i class="fas fa-plus me-2"></i> إضافة مكان جديد
+                        </button>
+                    </div>
+                    
+                    <div class="row" id="myVenuesList">
+                        <!-- سيتم إضافة الأماكن هنا -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- صفحة إدارة الحجوزات -->
+    <section id="ownerBookingsSection" class="py-5">
+        <div class="container">
+            <h2 class="mb-4">إدارة الحجوزات</h2>
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>الحجز</th>
+                                    <th>المكان</th>
+                                    <th>العميل</th>
+                                    <th>تاريخ الوصول</th>
+                                    <th>تاريخ المغادرة</th>
+                                    <th>السعر الإجمالي</th>
+                                    >الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ownerBookingsList">
+                                <!-- سيتم إضافة الحجوزات هنا -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- صفحة إدارة المراجعات -->
+    <section id="ownerReviewsSection" class="py-5">
+        <div class="container">
+            <h2 class="mb-4">إدارة المراجعات</h2>
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>المراجعة</th>
+                                    <th>المكان</th>
+                                    <th>العميل</th>
+                                    <th>التقييم</th>
+                                    <th>التاريخ</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ownerReviewsList">
+                                <!-- سيتم إضافة المراجعات هنا -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- نموذج إضافة مكان جديد -->
+    <div id="createVenueModal" class="modal fade">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">إضافة مكان جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createVenueForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">اسم المكان</label>
+                                    <input type="text" class="form-control" id="venueName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">نوع المكان</label>
+                                    <select class="form-select" id="venueType" required>
+                                        <option value="">اختر النوع</option>
+                                        <option value="hall">قاعة</option>
+                                        <option value="chalet">شاليه</option>
+                                        <option value="car">سيارة</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">وصف المكان</label>
+                                    <textarea class="form-control" id="venueDescription" rows="4" required></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">الموقع</label>
+                                    <input type="text" class="form-control" id="venueLocation" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">الإحداثيات</label>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <input type="number" class="form-control" id="venueLatitude" placeholder="العرض" step="any">
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="number" class="form-control" id="venueLongitude" placeholder="الطول" step="any">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">السعر لليلة</label>
+                                    <input type="number" class="form-control" id="venuePrice" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">وسائل الراحة</label>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="wifi">
+                                        <label class="form-check-label" for="wifi">واي فاي</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="parking">
+                                        <label class="form-check-label" for="parking">مواقف</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="ac">
+                                        <label class="form-check-label" for="ac">تكييف</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="kitchen">
+                                        <label class="form-check-label" for="kitchen">مطبخ</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">صور المكان</label>
+                            <input type="file" class="form-control" id="venueImages" multiple accept="image/*">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save me-2"></i> حفظ المكان
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
