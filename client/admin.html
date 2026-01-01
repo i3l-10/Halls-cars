@@ -3,388 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الأدمن - منصة الحجز المتكاملة</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <title>لوحة تحكم الإدارة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background: #2c3e50; color: #ecf0f1; margin: 0; display: flex; }
+        
+        /* Sidebar */
+        .sidebar { width: 250px; background: #34495e; height: 100vh; padding: 20px; }
+        .sidebar h2 { margin-bottom: 40px; color: #3498db; }
+        .menu-item { padding: 15px; cursor: pointer; border-bottom: 1px solid #7f8c8d; transition: 0.3s; }
+        .menu-item:hover { background: #2c3e50; padding-right: 25px; }
+
+        /* Main Content */
+        .content { flex: 1; padding: 40px; overflow-y: auto; height: 100vh; }
+        
+        .stat-card { background: #fff; color: #333; padding: 20px; border-radius: 8px; display: inline-block; width: 200px; margin-left: 20px; text-align: center; }
+        .stat-num { font-size: 2rem; font-weight: bold; color: #e74c3c; }
+
+        table { width: 100%; border-collapse: collapse; background: #ecf0f1; color: #333; margin-top: 20px; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 15px; text-align: right; border-bottom: 1px solid #ddd; }
+        th { background: #bdc3c7; }
+        
+        .btn-approve { background: #27ae60; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 4px; }
+        .section { display: none; }
+        .section.active { display: block; }
+    </style>
 </head>
 <body>
-    <!-- شريط التنقل -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#">
-                <i class="fas fa-shield-alt text-warning me-2"></i>
-                لوحة الأدمن
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#dashboard">لوحة التحكم</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#users">إدارة المستخدمين</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#venues">إدارة الأماكن</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#bookings">إدارة الحجوزات</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#reviews">إدارة المراجعات</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#subscriptions">الاشتراكات</a>
-                    </li>
-                </ul>
-                <div class="d-flex align-items-center">
-                    <div id="adminMenu" class="d-none">
-                        <span class="me-3">مرحباً، <span id="adminName"></span></span>
-                        <button class="btn btn-outline-light btn-sm me-2" onclick="showAdminProfile()">
-                            <i class="fas fa-user"></i> الملف الشخصي
-                        </button>
-                        <button class="btn btn-outline-danger btn-sm" onclick="adminLogout()">
-                            <i class="fas fa-sign-out-alt"></i> خروج
-                        </button>
-                    </div>
-                    <div id="adminAuthButtons">
-                        <button class="btn btn-outline-light btn-sm me-2" onclick="showAdminLogin()">
-                            <i class="fas fa-sign-in-alt"></i> دخول
-                        </button>
-                    </div>
-                </div>
+
+    <div class="sidebar">
+        <h2>لوحة الأدمن</h2>
+        <div class="menu-item" onclick="showSection('dashboard')">الإحصائيات</div>
+        <div class="menu-item" onclick="showSection('pending')">طلبات النشر</div>
+        <div class="menu-item" onclick="showSection('otps')">رموز التحقق (OTP)</div>
+    </div>
+
+    <div class="content">
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="section active">
+            <h1>نظرة عامة</h1>
+            <div id="stats-container">
+                <div class="stat-card">المستخدمين <div class="stat-num" id="s-users">-</div></div>
+                <div class="stat-card">الحجوزات <div class="stat-num" id="s-bookings">-</div></div>
+                <div class="stat-card">الأرباح <div class="stat-num" id="s-revenue">-</div></div>
             </div>
         </div>
-    </nav>
 
-    <!-- صفحة دخول الأدمن -->
-    <div id="adminLoginModal" class="modal fade">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title">تسجيل دخول الأدمن</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="adminLoginForm">
-                        <div class="mb-3">
-                            <label class="form-label">اسم المستخدم</label>
-                            <input type="text" class="form-control" id="adminUsername" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">كلمة المرور</label>
-                            <input type="password" class="form-control" id="adminPassword" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-sign-in-alt me-2"></i> دخول
-                        </button>
-                    </form>
-                    <div class="text-center mt-3">
-                        <small class="text-muted">اسم المستخدم: admin | كلمة المرور: admin123</small>
-                    </div>
-                </div>
-            </div>
+        <!-- Pending Listings Section -->
+        <div id="pending" class="section">
+            <h1>طلبات بانتظار الموافقة</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>النوع</th>
+                        <th>العنوان</th>
+                        <th>السعر</th>
+                        <th>إجراء</th>
+                    </tr>
+                </thead>
+                <tbody id="pending-table"></tbody>
+            </table>
+        </div>
+
+        <!-- OTPs Section -->
+        <div id="otps" class="section">
+            <h1>مراقبة OTP (للتحقق)</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>رقم الهاتف</th>
+                        <th>الكود</th>
+                        <th>الوقت</th>
+                    </tr>
+                </thead>
+                <tbody id="otp-table"></tbody>
+            </table>
         </div>
     </div>
 
-    <!-- لوحة تحكم الأدمن -->
-    <section id="adminDashboard" class="py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <h2 class="mb-4">لوحة تحكم الأدمن</h2>
-                    
-                    <!-- الإحصائيات الرئيسية -->
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <div class="card text-center border-primary">
-                                <div class="card-body">
-                                    <i class="fas fa-users fa-2x text-primary mb-2"></i>
-                                    <h5 class="card-title">المستخدمون</h5>
-                                    <p class="card-text h4 text-primary" id="totalUsers">0</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card text-center border-success">
-                                <div class="card-body">
-                                    <i class="fas fa-building fa-2x text-success mb-2"></i>
-                                    <h5 class="card-title">الأماكن الموافق عليها</h5>
-                                    <p class="card-text h4 text-success" id="approvedVenues">0</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card text-center border-warning">
-                                <div class="card-body">
-                                    <i class="fas fa-clock fa-2x text-warning mb-2"></i>
-                                    <h5 class="card-title">قيد المراجعة</h5>
-                                    <p class="card-text h4 text-warning" id="pendingVenues">0</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card text-center border-info">
-                                <div class="card-body">
-                                    <i class="fas fa-calendar-check fa-2x text-info mb-2"></i>
-                                    <h5 class="card-title">الحجوزات النشطة</h5>
-                                    <p class="card-text h4 text-info" id="activeBookings">0</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <script>
+        const API = 'http://localhost:3000/api';
 
-                    <!-- الأماكن قيد المراجعة -->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card border-warning">
-                                <div class="card-header bg-warning text-white">
-                                    <h5 class="mb-0">الأماكن قيد المراجعة</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div id="adminPendingVenues" class="list-group">
-                                        <!-- سيتم إضافة الأماكن هنا -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card border-danger">
-                                <div class="card-header bg-danger text-white">
-                                    <h5 class="mb-0">الحجوزات قيد المراجعة</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div id="adminPendingBookings" class="list-group">
-                                        <!-- سيتم إضافة الحجوزات هنا -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'dashboard') loadStats();
+            if(id === 'pending') loadPending();
+            if(id === 'otps') loadOtps();
+        }
 
-    <!-- إدارة المستخدمين -->
-    <section id="usersSection" class="py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <h2 class="mb-4">إدارة المستخدمين</h2>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>المعرّف</th>
-                                            >الاسم</th>
-                                            <th>البريد الإلكتروني</th>
-                                            <th>رقم الهاتف</th>
-                                            <th>النوع</th>
-                                            <th>الحالة</th>
-                                            <th>إجراءات</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="usersList">
-                                        <!-- سيتم إ��加 المستخدمين هنا -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+        async function loadStats() {
+            const res = await fetch(`${API}/admin/stats`);
+            const data = await res.json();
+            document.getElementById('s-users').innerText = data.users;
+            document.getElementById('s-bookings').innerText = data.bookings;
+            document.getElementById('s-revenue').innerText = data.revenue + ' ريال';
+        }
 
-    <!-- إدارة الأماكن -->
-    <section id="venuesSection" class="py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <h2 class="mb-4">إدارة الأماكن</h2>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>المعرّف</th>
-                                            <th>اسم المكان</th>
-                                            <th>النوع</th>
-                                            >الموقع</th>
-                                            <th>السعر</th>
-                                            <th>الحالة</th>
-                                            <th>الإجراءات</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="venuesList">
-                                        <!-- سيتم إضافة الأماكن هنا -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+        async function loadPending() {
+            const res = await fetch(`${API}/admin/listings/pending`);
+            const data = await res.json();
+            const html = data.map(item => `
+                <tr>
+                    <td>${item.type}</td>
+                    <td>${item.title}</td>
+                    <td>${item.price}</td>
+                    <td><button class="btn-approve" onclick="approve(${item.id})">موافقة ونشر</button></td>
+                </tr>
+            `).join('');
+            document.getElementById('pending-table').innerHTML = html || '<tr><td colspan="4" style="text-align:center">لا يوجد طلبات معلقة</td></tr>';
+        }
 
-    <!-- إدارة الحجوزات -->
-    <section id="bookingsSection" class="py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <h2 class="mb-4">إدارة الحجوزات</h2>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>المعرّف</th>
-                                            <th>المكان</th>
-                                            <th>العميل</th>
-                                            <th>تاريخ الوصول</th>
-                                            <th>تاريخ المغادرة</th>
-                                            <th>السعر الإجمالي</th>
-                                            >الحالة</th>
-                                            <th>الإجراءات</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="bookingsList">
-                                        <!-- سيتم إضافة الحجوزات هنا -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+        async function approve(id) {
+            await fetch(`${API}/admin/approve/${id}`, { method: 'POST' });
+            loadPending();
+        }
 
-    <!-- إدارة المراجعات -->
-    <section id="reviewsSection" class="py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <h2 class="mb-4">إدارة المراجعات</h2>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>المعرّف</th>
-                                            <th>المكان</th>
-                                            <th>العميل</th>
-                                            <th>التقييم</th>
-                                            <th>المراجعة</th>
-                                            >التاريخ</th>
-                                            <th>الإجراءات</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="reviewsList">
-                                        <!-- سيتم إضافة المراجعات هنا -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+        async function loadOtps() {
+            const res = await fetch(`${API}/admin/otps`);
+            const data = await res.json();
+            const html = data.map(item => `
+                <tr>
+                    <td>${item.phone}</td>
+                    <td style="color: #c0392b; font-weight: bold; letter-spacing: 2px;">${item.code}</td>
+                    <td>${new Date(item.created_at).toLocaleTimeString()}</td>
+                </tr>
+            `).join('');
+            document.getElementById('otp-table').innerHTML = html;
+        }
 
-    <!-- إدارة الاشتراكات -->
-    <section id="subscriptionsSection" class="py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <h2 class="mb-4">إدارة الاشتراكات</h2>
-                    <div class="card">
-                        <div class="card-body">
-                            <button class="btn btn-primary mb-3" onclick="showAddSubscriptionModal()">
-                                <i class="fas fa-plus me-2"></i> إضافة اشتراك جديد
-                            </button>
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>المعرّف</th>
-                                            <th>صاحب القاعة</th>
-                                            <th>النوع</th>
-                                            <th>السعر</th>
-                                            <th>تاريخ البدء</th>
-                                            <th>تاريخ الانتهاء</th>
-                                            <th>الحالة</th>
-                                            <th>الإجراءات</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="subscriptionsList">
-                                        <!-- سيتم إضافة الاشتراكات هنا -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- نموذج إضافة اشتراك -->
-    <div id="addSubscriptionModal" class="modal fade">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">إضافة اشتراك جديد</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addSubscriptionForm">
-                        <div class="mb-3">
-                            <label class="form-label">صاحب القاعة</label>
-                            <select class="form-select" id="subscriptionOwner" required>
-                                <option value="">اختر صاحب القاعة</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">نوع الاشتراك</label>
-                            <select class="form-select" id="subscriptionType" required>
-                                <option value="basic">Basic</option>
-                                <option value="premium">Premium</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">السعر</label>
-                            <input type="number" class="form-control" id="subscriptionPrice" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">تاريخ البدء</label>
-                            <input type="date" class="form-control" id="subscriptionStartDate" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">تاريخ الانتهاء</label>
-                            <input type="date" class="form-control" id="subscriptionEndDate" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-save me-2"></i> حفظ الاشتراك
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script.js"></script>
+        // Load dashboard on start
+        loadStats();
+    </script>
 </body>
 </html>
